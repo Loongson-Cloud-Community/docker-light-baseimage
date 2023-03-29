@@ -20,6 +20,9 @@ case "${UARCH}" in
     "i386")
         HOST_ARCH="386"
     ;;
+    "loongarch64")
+        HOST_ARCH="loongarch64"
+    ;;
     
     *)
         echo "Architecture not supported. Exiting."
@@ -51,17 +54,23 @@ if [[ "${HOST_ARCH}" == 'arm' ]]; then
     LC_ALL=C DEBIAN_FRONTEND=noninteractive c_rehash
 fi
 
-echo "Download cfssl ..."
-echo "curl -o /usr/sbin/cfssl -SL https://github.com/osixia/cfssl/releases/download/1.5.0/cfssl_linux-${HOST_ARCH}"
-curl -o /usr/sbin/cfssl -SL "https://github.com/osixia/cfssl/releases/download/1.5.0/cfssl_linux-${HOST_ARCH}"
-chmod 700 /usr/sbin/cfssl
+if [[ "${HOST_ARCH}" == 'loongarch64' ]]; then
+    # https://github.com/Loongson-Cloud-Community/cfssl/releases/download/v1.5.0/cfssl-1.5.0-bin-loongarch64.tar.gz
+    cp /container/cfssl-1.5.0-bin-loongarch64/cfssl /usr/sbin/cfssl
+    cp /container/cfssl-1.5.0-bin-loongarch64/cfssljson  /usr/sbin/cfssljson
+else
+    echo "Download cfssl ..."
+    echo "curl -o /usr/sbin/cfssl -SL https://github.com/osixia/cfssl/releases/download/1.5.0/cfssl_linux-${HOST_ARCH}"
+    curl -o /usr/sbin/cfssl -SL "https://github.com/osixia/cfssl/releases/download/1.5.0/cfssl_linux-${HOST_ARCH}"
+    chmod 700 /usr/sbin/cfssl
 
-echo "Download cfssljson ..."
-echo "curl -o /usr/sbin/cfssljson -SL https://github.com/osixia/cfssl/releases/download/1.5.0/cfssljson_linux-${HOST_ARCH}"
-curl -o /usr/sbin/cfssljson -SL "https://github.com/osixia/cfssl/releases/download/1.5.0/cfssljson_linux-${HOST_ARCH}"
-chmod 700 /usr/sbin/cfssljson
+    echo "Download cfssljson ..."
+    echo "curl -o /usr/sbin/cfssljson -SL https://github.com/osixia/cfssl/releases/download/1.5.0/cfssljson_linux-${HOST_ARCH}"
+    curl -o /usr/sbin/cfssljson -SL "https://github.com/osixia/cfssl/releases/download/1.5.0/cfssljson_linux-${HOST_ARCH}"
+    chmod 700 /usr/sbin/cfssljson
 
-echo "Project sources: https://github.com/cloudflare/cfssl"
+    echo "Project sources: https://github.com/cloudflare/cfssl"
+fi
 
 # remove tools installed to download cfssl
 if [ ${#to_install[@]} -ne 0 ]; then

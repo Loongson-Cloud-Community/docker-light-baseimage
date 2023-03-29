@@ -1,4 +1,4 @@
-FROM debian:buster-slim
+FROM cr.loongnix.cn/library/debian:buster-slim
 
 COPY . /container
 RUN /container/build.sh
